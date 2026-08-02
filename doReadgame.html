@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>英语跟读练习</title>
+  <link rel="stylesheet" href="https://unpkg.com/mdui@2/mdui.css">
+  <script src="https://unpkg.com/mdui@2/mdui.global.js"></script>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+  <script src="https://gosspublic.alicdn.com/aliyun-oss-sdk-6.17.1.min.js"></script>
+  <style>
+    @font-face {
+      font-family: 'jc';
+      font-style: normal;
+      font-weight: 400;
+      src: url(https://vanthink.oss-cn-qingdao.aliyuncs.com/GoogleSansFlexRegular.jpg) format('woff2');
+    }
+    html {
+      font-family: 'jc',Arial,Helvetica,Sans-Serif;
+    }
+    .exercise-container { display: none; }
+    .exercise-container.active { display: block; }
+    .waveform {
+      margin: auto;
+      width: 200px;
+      height: 60px;
+      background: #f0f0f0;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    canvas { width: 100%; height: 100%; }
+    .word-section {
+      text-align: center;
+      margin: 16px 0;
+    }
+    .score-display {
+      text-align: center;
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #2e7d32;
+      min-height: 1.5em;
+      margin: 12px 0;
+    }
+    .action-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-top: 12px;
+    }
+    /* 右上角计时器 */
+    #timer-chip {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body class="mdui-theme-primary-indigo mdui-theme-accent-pink">
+
+<!-- 计时器 chip -->
+<mdui-chip id="timer-chip" variant="filled" color="primary">00:00</mdui-chip>
+
+<div class="mdui-container-fluid">
+  <div id="exercises"></div>
+</div>
+
+<script src="doReadGame.js"></script>
+<script>
+renderReadGame();
+</script>
+
+</body>
+</html>

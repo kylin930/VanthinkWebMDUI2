@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no"/>
+    <meta name="renderer" content="webkit"/>
+    <title>MD2</title>
+    <link rel="stylesheet" href="https://unpkg.com/mdui@2/mdui.css" />
+    <script src="https://unpkg.com/mdui@2/mdui.global.js"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <style>
+        .container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .page {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateX(0);
+        }
+
+        .page1 {
+            z-index: 2;
+        }
+
+        .page2 {
+            z-index: 1;
+            transform: translateX(100%);
+        }
+
+        .page.active {
+            transform: translateX(0);
+        }
+
+        .page1:not(.active) {
+            transform: translateX(-100%);
+        }
+
+        .page2:not(.active) {
+            transform: translateX(100%);
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            display: none;
+        }
+
+        .page2 .back-btn {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="page page1 active">
+            <mdui-top-app-bar style="position: relative;">
+              <mdui-button-icon icon="menu"></mdui-button-icon>
+              <mdui-top-app-bar-title>Home</mdui-top-app-bar-title>
+              <div style="flex-grow: 1"></div>
+              <mdui-button-icon icon="more_vert"></mdui-button-icon>
+            </mdui-top-app-bar>
+            <div class="back-btn" id="backBtn">返回</div>
+            <p>这是第一个页面</p>
+            <mdui-button variant="tonal" id="nextBtn">页面 2</mdui-button>
+        </div>
+        <div class="page page2">
+            <mdui-top-app-bar style="position: relative;">
+              <mdui-button-icon icon="arrow_back" id="backBtn2"></mdui-button-icon>
+              <mdui-top-app-bar-title>Next</mdui-top-app-bar-title>
+              <div style="flex-grow: 1"></div>
+              <mdui-button-icon icon="more_vert"></mdui-button-icon>
+            </mdui-top-app-bar>
+            <p>这是第二个页面</p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('nextBtn').addEventListener('click', function() {
+            document.querySelector('.page1').classList.remove('active');
+            document.querySelector('.page2').classList.add('active');
+        });
+
+        document.getElementById('backBtn2').addEventListener('click', function() {
+            document.querySelector('.page1').classList.add('active');
+            document.querySelector('.page2').classList.remove('active');
+        });
+    </script>
+</body>
+</html>

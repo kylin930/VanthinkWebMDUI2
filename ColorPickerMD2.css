@@ -1,0 +1,86 @@
+.color-preset {
+    display: flex;
+    padding: 0.5rem 0;
+    gap: 0.5rem;
+}
+.color-preset div {
+    cursor: pointer;
+    box-sizing: border-box;
+    width: 1.875rem;
+    height: 1.875rem;
+    border-radius: var(--mdui-shape-corner-extra-small);
+    border: 0.0625rem solid rgb(var(--mdui-color-outline));
+}
+
+.color-preset .red    {
+    background-color: #bb1614;
+}
+.color-preset .purple {
+    background-color: #9a25ae;
+}
+.color-preset .blue   {
+    background-color: #0061a4;
+}
+.color-preset .green  {
+    background-color: #00681c;
+}
+.color-preset .yellow   {
+    background-color: #695f00;
+}
+.color-preset .grey   {
+    background-color: #006874;
+}
+
+.color-custom-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+    max-width: calc(7 * 1.875rem + 6 * 0.5rem);
+}
+.color-custom-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+    max-width: calc(7 * 1.875rem + 6 * 0.5rem);
+}
+
+.color-custom {
+    cursor: pointer;
+    box-sizing: border-box;
+    width: 1.875rem;
+    height: 1.875rem;
+    border-radius: var(--mdui-shape-corner-extra-small);
+    border: 0.0625rem solid rgb(var(--mdui-color-outline));
+}
+
+.color-custom {
+    width: 1.875rem !important;
+    height: 1.875rem !important;
+    min-width: 1.875rem;
+    min-height: 1.875rem;
+    box-sizing: border-box;
+}
+
+.color-custom.add-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--mdui-color-surface-variant);
+    color: var(--mdui-color-on-surface-variant);
+    cursor: pointer;
+}
+
+.color-label {
+    cursor: default;
+    color: rgb(var(--mdui-color-on-surface-variant));
+    font-size: var(--mdui-typescale-title-small-size);
+    font-weight: var(--mdui-typescale-title-small-weight);
+    letter-spacing: var(--mdui-typescale-title-small-tracking);
+    line-height: var(--mdui-typescale-title-small-line-height);
+}
+
+.clear-custom-btn {
+    margin-top: 0.5rem;
+}

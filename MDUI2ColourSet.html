@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MDUI 2 动态主题切换</title>
+
+  <link rel="stylesheet" href="https://unpkg.com/mdui@2/mdui.css" />
+  <link rel="stylesheet" href="ColorPickerMD2.css" />
+  <script src="https://unpkg.com/mdui@2/mdui.global.js"></script>
+  <link href="https://fonts.font.im/css?family=Roboto" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+
+  <style>
+    body {
+      font-family: 'Roboto';
+    }
+  </style>
+</head>
+<body class="mdui-theme-layout-auto">
+
+<div class="mdui-container">
+  <h1 class="mdui-typo-display-1">MDUI2主题色</h1>
+  <mdui-button-icon id="qh"></mdui-button-icon>
+
+  <!-- 主题切换器 -->
+  <div id="theme-switcher" class="mdui-panel mdui-panel-gapless mdui-m-t-4">
+    <!-- 预设颜色 -->
+    <div class="mdui-panel-item mdui-panel-item-open">
+      <div class="color-label">预设颜色</div>
+      <div class="mdui-panel-item-body">
+        <div class="color-preset">
+          <div class="red" data-color="#bb1614"></div>
+          <div class="purple" data-color="#9a25ae"></div>
+          <div class="blue" data-color="#0061a4"></div>
+          <div class="green" data-color="#00681c"></div>
+          <div class="yellow" data-color="#695f00"></div>
+          <div class="grey" data-color="#006874"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 自选颜色 -->
+    <div class="mdui-panel-item">
+      <div class="color-label">
+        自选颜色
+      </div>
+      <div class="mdui-panel-item-body">
+        <div class="color-custom-container" id="custom-colors-container">
+          <!-- 色块和 + 按钮将由 JS 渲染 -->
+        </div>
+
+        <!-- 隐藏的颜色选择器 -->
+        <input type="color" id="colorPicker" style="display:none" />
+      </div>
+    </div>
+
+    <!-- 从壁纸提取 -->
+    <div class="mdui-panel-item">
+      <div class="color-label">从壁纸提取颜色</div>
+      <div class="mdui-panel-item-body" style="padding: 0.5rem 0;">
+        <!-- 隐藏原生文件输入 -->
+        <input type="file" id="wallpaperInput" accept="image/*" style="display: none" />
+
+        <!-- 美化按钮：点击触发文件选择 -->
+        <mdui-button id="wallpaperBtn" variant="outlined" icon="image">
+          选择壁纸自动取色
+        </mdui-button>
+
+        <!-- 提取结果提示（可选） -->
+        <p id="extractedColor" class="mdui-m-t-2 mdui-text-color-theme-hint"></p>
+      </div>
+    </div>
+
+  <!-- 示例组件 -->
+  <div class="mdui-m-t-6">
+    <mdui-button variant="filled">Filled 按钮</mdui-button>
+    <mdui-button variant="tonal">Tonal 按钮</mdui-button>
+    <mdui-chip selected>选中 Chip</mdui-chip>
+    <mdui-text-field label="输入框示例" variant="filled"></mdui-text-field>
+    <mdui-switch>开关</mdui-switch>
+  </div>
+</div>
+
+<script src="UIThemeModeMD2.js"></script>
+<script src="ColorPickerMD2.js"></script>
+
+</body>
+</html>

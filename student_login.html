@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+    <!--<form action="http://api.wxzxzj.com/api/auth/student/login" method="post">
+      Phone:<input type="text" name="phone"><br>
+      Password:<input type="password" name="password"><br>
+      <input type="submit">
+    </form>-->
+    <button id="send">喵喵喵</button>
+    <script>
+      async function sendData(data) {
+        const formData = new FormData();
+
+        // 添加文本字段
+        formData.append("phone", "13977973602");
+        formData.append("password", "123455nm");
+
+        try {
+          const response = await fetch("https://api.wxzxzj.com/api/auth/student/login", {
+            method: "POST",
+            // 将 FormData 实例设置为请求正文
+            body: formData,
+          });
+          console.log(await response.json());
+        } catch (e) {
+          console.error(e);
+        }
+      }
+
+      const send = document.querySelector("#send");
+      send.addEventListener("click", sendData);
+    </script>
+  </body>
+</html>

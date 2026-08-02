@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Advanced Easter Egg</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <style>
+    .btn {
+      padding: 14px 28px;
+      font-size: 18px;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      margin: 12px 0;
+      user-select: none;
+    }
+    #secret-trigger {
+      background: linear-gradient(135deg, #4361ee, #3a0ca3);
+      color: white;
+    }
+    #nuclear-button {
+      background: linear-gradient(135deg, #f72585, #b5179e);
+      color: white;
+      opacity: 0.6;
+      pointer-events: none; /* 初始禁用视觉提示 */
+    }
+    .card {
+      margin: 15px;
+      padding: 16px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
+  </style>
+  <link rel="stylesheet" href="https://unpkg.com/mdui@2/mdui.css" />
+  <script src="https://unpkg.com/mdui@2/mdui.global.js"></script>
+</head>
+<body>
+
+<button id="secret-trigger">点我（5秒内点5次）</button>
+<p>或者疯狂点击页面任意地方（15秒内点15次）触发终极爆炸！</p>
+<mdui-button>Hello, world!</mdui-button>
+
+<div class="item">卡片 1</div>
+<div class="item">卡片 2</div>
+<div class="item">文字块</div>
+<img src="https://via.placeholder.com/100" alt="图片也可点">
+
+<script type="module">
+  import { startAdvancedEasterEgg } from './destructiveEasterEgg.js';
+  // 启动系统，指定触发器
+  startAdvancedEasterEgg('#secret-trigger');
+</script>
+
+</body>
+</html>

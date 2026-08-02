@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no"/>
+    <meta name="renderer" content="webkit"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="icon" type="image/x-icon" href="https://www.wxzxzj.com/favicon.ico">
+    <title>Vanthink WebMDUI2</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/mdui@2/mdui.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <link rel="stylesheet" href="ColorPickerMD2.css" />
+    <link rel="stylesheet" href="index.css" />
+    <script async src="https://gosspublic.alicdn.com/aliyun-oss-sdk-6.17.1.min.js"></script>
+    <script async src="qrcode.min.js"></script>
+    <script async src="jsQR.js"></script>
+    <script async src="qr.js"></script>
+
+    <style>
+      html {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-size-adjust: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+        transform: translateZ(0) !important;
+        -webkit-transform: translateZ(0) !important;
+        box-sizing: border-box;
+        position: relative;
+      }
+
+      *, *::before, *::after {
+        box-sizing: border-box;
+      }
+    </style>
+  </head>
+  <body>
+    <script src="https://unpkg.com/mdui@2/mdui.global.js"></script>
+    <div style="position: relative; height: 100vh;" id="JMload">
+      <img src="https://chat-page.oss-cn-hangzhou.aliyuncs.com/81327/upload/abaa72815cdf4b0cb4fcec70f01bf08e/38ff5486d25a49d0b8a4ef14b0599250.gif" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);" width="82px" height="82px" />
+    </div>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('JMload').style.cssText = "position: relative; height: 100vh; display: none;";
+        function testApiLatency(url, apiName) {
+          const startTime = Date.now();
+          fetch(url, { method: 'GET', cache: 'no-cache' })
+            .then(response => {
+              const latency = Date.now() - startTime;
+              let tip = latency < 450
+                ? `与${apiName}的连接良好喵`
+                : `与${apiName}的连接有点差喵`;
+              mdui.snackbar({
+                message: `连接延迟: ${latency} ms，${tip}`
+              });
+            })
+            .catch(error => {
+              console.error(`连接 ${apiName} 失败:`, error);
+              mdui.snackbar({
+                message: `连接${apiName}失败了喵`
+              });
+            });
+        }
+
+        testApiLatency("https://api.wxzxzj.com/api/userinfo/getAccount", "官方API");
+      });
+    </script>
+
+    <mdui-dialog close-on-overlay-click style="width: 100%;height: auto" id="dohw"></mdui-dialog>
+    <mdui-dialog close-on-overlay-click id="ranklist-dialog">
+      <span slot="headline">练习排行榜</span>
+      <mdui-list id="rankingList" style="width: 350px;"></mdui-list>
+      <mdui-button slot="action" variant="text" onclick="rankListDialog.open=false;">关闭</mdui-button>
+    </mdui-dialog>
+    <mdui-dialog fullscreen id="doreadgame">
+      <mdui-circular-progress id="readgame-load"></mdui-circular-progress>
+      <mdui-chip id="timer-chip" variant="filled" color="primary">00:00</mdui-chip>
+      <div class="mdui-container-fluid">
+        <div id="exercises"></div>
+      </div>
+      <mdui-button slot="action" variant="text" onclick="drg.open=false;">取消</mdui-button>
+    </mdui-dialog>
+    <mdui-dialog close-on-overlay-click id="mode-dialog" headline="请选择你的传输角色喵">
+      <div id="dialog-content">
+        <mdui-button variant="tonal" onclick="chooseMode('sender')">
+          我是被传端
+        </mdui-button>
+        <mdui-button variant="tonal" onclick="chooseMode('receiver')">
+          我是接收端
+        </mdui-button>
+        <img src="https://teachermate.oss-cn-qingdao.aliyuncs.com/8Lt7L-1765032420370-56044@2x.png" style="width: 95px;" />
+      </div>
+    </mdui-dialog>
+    <mdui-dialog close-on-overlay-click id="update-dialog" headline="已发现新版本喵">
+      <div id="changelog-content"></div>
+      <mdui-button slot="action" variant="text" id="acknowledge-btn">知道了喵</mdui-button>
+    </mdui-dialog>
+    <mdui-dialog id="selectHomeworkDialog" headline="选择要完成的作业">
+      <div id="homeworkCheckboxes"></div>
+      <mdui-button id="startBatchBtn" slot="action">开始执行（0/30）</mdui-button>
+    </mdui-dialog>
+    <mdui-dialog close-on-overlay-click style="width: 100%;height: auto" id="about-dialog">
+      <span slot="headline">关于本程序</span>
+      <img src="https://teachermate.oss-cn-qingdao.aliyuncs.com/4BgZ1-1765030476199-56025@2x%EF%BC%88no-corner%EF%BC%89.png" style="position: absolute;left: 0px;bottom: 35px;width: 80px;" />
+      <mdui-list>
+        <mdui-list-item rounded>作者
+        <span slot="description">小林</span>
+        </mdui-list-item>
+
+        <mdui-list-item id="ver-btn" rounded>版本
+        <span slot="description">v3.0.0 Release</span>
+        </mdui-list-item>
+
+        <mdui-list-item id="ciallo" rounded>Ciallo～(∠・ω< )⌒★
+        <span slot="description">Ciallo～(∠・ω< )⌒★</span>
+        </mdui-list-item>
+
+        <mdui-list-item id="verlog-btn" rounded>获取更新日志
+        <span slot="description"></span>
+        </mdui-list-item>
+
+        <mdui-list-item id="dis-btn" rounded>免责声明
+        <span slot="description"></span>
+        </mdui-list-item>
+      </mdui-list>
+      <mdui-button slot="action" variant="tonal" onclick="window.location.href='https://www.xiaorin.com';">小林的小窝</mdui-button>
+      <mdui-button slot="action" variant="text" onclick="document.getElementById('about-dialog').open=false;">关闭</mdui-button>
+    </mdui-dialog>
+    <mdui-dialog close-on-overlay-click style="width: 100%;height: auto" id="disclaimer-dialog">
+      <span slot="headline">第三方程序免责声明</span>
+      <p>
+        本项目为<strong>个人开发、非商业、非营利性质</strong>的技术学习项目，旨在研究 Web 接口交互机制，
+        <strong>与「万星在线助教」及其主办方无任何关联</strong>，亦未获得其授权、赞助或认可。
+      </p>
+      <ul>
+        <li>
+          所使用接口信息系通过<strong>浏览器开发者工具（DevTools）观察官方网页正常运行时的网络请求</strong>获取，
+          <strong>未对原软件进行反编译、脱壳、注入或其他任何形式的逆向工程</strong>。
+        </li>
+        <li>
+          所有数据均来自「万星在线助教」，其商标、版权及相关知识产权归原权利方所有。
+          本项目在展示内容时已尽量保留来源标识，<strong>未隐藏或篡改平台特有信息</strong>。
+        </li>
+        <li>
+          本工具严格遵循<strong>最小必要请求原则</strong>：
+          无后台轮询、无自动刷新、无批量抓取，仅在用户主动操作时发起请求，
+          <strong>不会对「万星在线助教」服务器造成额外负担</strong>。
+        </li>
+        <li>
+          根据「万星在线助教」《用户协议》第9条：
+          “未经许可，不得以任何方式（包括但不限于：非法抓取、模拟下载等）间接获取平台信息内容”。
+          <strong>使用本工具即视为您已知悉并自愿承担由此可能引发的账号限制、服务中断或法律风险</strong>。
+        </li>
+        <li>
+          本项目<strong>不存储、不代理、不缓存</strong>您的账号凭证或平台数据，
+          所有请求均由您的浏览器直接发送至官方服务器。
+        </li>
+      </ul>
+
+      <p>
+        如「万星在线助教」主办方提出异议或要求停止使用相关接口，
+        本项目将立即终止维护并下线相关内容。
+      </p>
+    </mdui-dialog>
+    <mdui-dialog id="message-list">
+      <mdui-list id="notice-list"></mdui-list>
+      <div slot="action" class="page-info" id="page-info"><mdui-circular-progress></mdui-circular-progress></div>
+      <mdui-button slot="action" variant="tonal" id="read-page">已读本页</mdui-button>
+      <mdui-button slot="action" id="prev-page">上一页</mdui-button>
+      <mdui-button slot="action" id="next-page">下一页</mdui-button>
+      <mdui-button slot="action" onclick="messageListDialog.open=false;">关闭</mdui-button>
+    </mdui-dialog>
+    <div style="position: relative; height: 100vh;" id="load">
+      <mdui-circular-progress style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"></mdui-circular-progress>
+    </div>
+    <div class="page-container">
+      <mdui-navigation-drawer modal close-on-esc close-on-overlay-click contained id="navDraw">
+        <mdui-button-icon icon="close" id="closeNav"></mdui-button-icon>
+        <mdui-card style="width: 100%;height: 100px">
+          <div class="user-card">
+            <div class="avatar-frame">
+              <mdui-avatar src="" style="margin-right: 30px;margin-left: 30px;margin-top:1px;height: 45px;width: 45px;" id="ava">我</mdui-avatar>
+            </div>
+            <div class="info">
+              <div class="nickname-line">
+                <span class="nickname">未知用户</span>
+                <img src="" class="vip-icon">
+              </div>
+              <div class="id">id: 114514</div>
+            </div>
+          </div>
+          <img src="https://teachermate.oss-cn-qingdao.aliyuncs.com/MPciu-1765029067522-4235651@2x%EF%BC%88no-text%EF%BC%89.png" style="position: absolute;right: -1px;bottom: -3px;width: 75px;" />
+        </mdui-card>
+        <mdui-list>
+          <mdui-list-item icon="message" id="msglist" rounded>通知消息</mdui-list-item>
+          <mdui-list-item icon="logout" id="logout" rounded>退出登录</mdui-list-item>
+        </mdui-list>
+      </mdui-navigation-drawer>
+      <div class="page active" style="padding-top: 64px;" id="page1">
+        <div style="position: relative;overflow: hidden">
+          <mdui-top-app-bar scroll-behavior="elevate">
+            <mdui-button-icon icon="menu" id="openNav"></mdui-button-icon>
+            <mdui-top-app-bar-title>Vanthink WebMDUI2</mdui-top-app-bar-title>
+            <div style="flex-grow: 1"></div>
+            <mdui-button-icon id="qh"></mdui-button-icon>
+            <mdui-dropdown>
+              <mdui-button-icon slot="trigger" icon="color_lens"></mdui-button-icon>
+              <mdui-card style="padding: 1rem;">
+                <div id="theme-switcher" class="mdui-panel mdui-panel-gapless mdui-m-t-4">
+                  <div class="mdui-panel-item mdui-panel-item-open">
+                    <div class="color-label">预设颜色</div>
+                    <div class="mdui-panel-item-body">
+                      <div class="color-preset">
+                        <div class="red" data-color="#bb1614"></div>
+                        <div class="purple" data-color="#9a25ae"></div>
+                        <div class="blue" data-color="#0061a4"></div>
+                        <div class="green" data-color="#00681c"></div>
+                        <div class="yellow" data-color="#695f00"></div>
+                        <div class="grey" data-color="#006874"></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="mdui-panel-item">
+                    <div class="color-label">
+                      自选颜色
+                    </div>
+                    <div class="mdui-panel-item-body">
+                      <div class="color-custom-container" id="custom-colors-container">
+                      </div>
+
+                      <input type="color" id="colorPicker" style="display:none" />
+                    </div>
+                  </div>
+
+                  <div class="mdui-panel-item">
+                    <div class="color-label">从壁纸提取颜色</div>
+                    <div class="mdui-panel-item-body" style="padding: 0.5rem 0;">
+                      <input type="file" id="wallpaperInput" accept="image/*" style="display: none" />
+                      <mdui-button id="wallpaperBtn" variant="outlined" icon="image">
+                        选择壁纸自动取色
+                      </mdui-button>
+                      <p id="extractedColor" class="mdui-m-t-2 mdui-text-color-theme-hint"></p>
+                    </div>
+                  </div>
+                  <mdui-checkbox id="rememberColorCheckbox">记住所选主题色</mdui-checkbox>
+                </div>
+            </mdui-dropdown>
+            <mdui-dropdown>
+              <mdui-button-icon slot="trigger" icon="more_vert"></mdui-button-icon>
+              <mdui-menu>
+                <mdui-menu-item id="about">关于</mdui-menu-item>
+                <mdui-menu-item id="trans-btn">迁移Auth</mdui-menu-item>
+                <mdui-menu-item id="homeworkBatchDo">多选练习</mdui-menu-item>
+              </mdui-menu>
+            </mdui-dropdown>
+          </mdui-top-app-bar>
+        </div>
+        <mdui-segmented-button-group selects="single" value="all" id="timefilter">
+          <mdui-segmented-button value="all">全部</mdui-segmented-button>
+          <mdui-segmented-button value="week">本周</mdui-segmented-button>
+          <mdui-segmented-button value="last_week">上周</mdui-segmented-button>
+          <mdui-segmented-button value="month">本月</mdui-segmented-button>
+        </mdui-segmented-button-group>
+        <mdui-segmented-button-group selects="single" value="all" id="degfilter">
+          <mdui-segmented-button value="all">全部</mdui-segmented-button>
+          <mdui-segmented-button value="done">已完成</mdui-segmented-button>
+          <mdui-segmented-button value="undone">未完成</mdui-segmented-button>
+        </mdui-segmented-button-group>
+
+        <mdui-list id="data-container" style="margin-bottom: 30px;"></mdui-list>
+      </div>
+      <div class="page" style="padding-top: 64px;" id="page2">
+        <div style="position: relative;overflow: hidden">
+          <mdui-top-app-bar scroll-behavior="elevate">
+            <mdui-button-icon icon="arrow_back" id="back"></mdui-button-icon>
+            <mdui-top-app-bar-title id="appbar-title">Vanthink WebMDUI2</mdui-top-app-bar-title>
+          </mdui-top-app-bar>
+        </div>
+        <div class="page-content">
+          <mdui-linear-progress style="position: relative; height: 100vh;" id="load1"></mdui-linear-progress>
+          <div id="detail-content">
+            <mdui-card style="width: 100%;height: auto;">
+              <div style="display: flex;">
+                <mdui-icon name="info" style="font-size: 32px; padding: 20px;"></mdui-icon>
+                <p style="padding-left: 20px" id="detail">这是Null老师于91月78日布置给 “Null班” 的练习喵，91模式。</p>
+                <img src="https://teachermate.oss-cn-qingdao.aliyuncs.com/As09n-1765029241644-56019@2x.png" style="width: 90px;" />
+              </div>
+
+              <mdui-button icon="share" style="float: right;" id="homeworkShare">炫耀一下</mdui-button>
+              <mdui-button icon="assignment_turned_in" style="float: right;" id="homeworkOneDo">一键完成非口语作业（Beta）</mdui-button>
+            </mdui-card>
+            <mdui-card style="width: 100%;height: auto; margin-top: 20px;">
+              <mdui-list id="homework-list"></mdui-list>
+            </mdui-card>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="UIThemeModeMD2.js"></script>
+    <script src="ColorPickerMD2.js"></script>
+    <!--<script src="doReadGame.js"></script>-->
+    <script src="trans.js"></script>
+    <script src="getUpdateLog.js"></script>
+    <script src="index_tY4mX2gU.js"></script>
+    <script src="index_uF4aI7iR.js"></script>
+    <script src="index_pV9zI6mU.js"></script>
+    <script src="index_1737esdt.js"></script>
+    <script src="index_gN2xY5qQ.js"></script>
+    <script src="index_mG4bU8tP.js"></script>
+    <script src="ciallo.js"></script>
+    <script type="module">
+      import { startAdvancedEasterEgg } from './destructiveEasterEgg.js';
+      startAdvancedEasterEgg('#ver-btn');
+    </script>
+  </body>
+</html>

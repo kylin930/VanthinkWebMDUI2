@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>二维码生成器</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no"/>
+<meta name="renderer" content="webkit"/>
+<link rel="stylesheet" href="https://unpkg.com/mdui@2/mdui.css" />
+<script src="https://unpkg.com/mdui@2/mdui.global.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="jsQR.js"></script>
+<script src="qr.js"></script>
+
+<style>
+    .qr-container {
+      position: relative;
+      width: 320px; /* 设置容器宽度 */
+      height: 256px; /* 设置容器高度 */
+      margin: 0 auto;
+      background-image: url('https://teachermate.oss-cn-qingdao.aliyuncs.com/v5jtf-1764931732227-d9fa9fbda07e423c9edd0e54fbcf666e_0_visibleWatermark.png'); /* 替换为你的背景图片URL */
+      background-size: cover; /* 让背景图片覆盖整个容器，同时保持图片比例 */
+      background-position: center; /* 让背景图片居中显示 */
+      text-align: center;
+    }
+    #qr-code {
+      position: absolute;
+      top: 35%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 160px; /* 根据需要调整二维码大小 */
+      height: 160px; /* 根据需要调整二维码大小 */
+    }
+    .corner-img {
+      width: 90px; /* 角落图片的宽度 */
+      position: absolute;
+      bottom: 10px; /* 距离底部的距离 */
+    }
+    #left-corner {
+      left: 10px; /* 左边距 */
+    }
+    #right-corner {
+      right: 10px; /* 右边距 */
+    }
+    #preview-video {
+      width: 100%;
+      height: 240px;
+      background: #000;
+      border-radius: 8px;
+      margin: 12px 0;
+    }
+    #qrcode-display {
+      text-align: center;
+      margin: 12px 0;
+    }
+    #qrcode-display canvas, #qrcode-display table {
+      margin: 0 auto;
+      max-width: 100%;
+    }
+  </style>
+</head>
+<body mdui-theme="light">
+
+<!-- 对话框 -->
+<mdui-dialog id="mode-dialog" headline="请选择" persistent>
+  <div id="dialog-content">
+    <mdui-button variant="tonal" style="margin-bottom:12px;" onclick="chooseMode('sender')">
+      我是被传端
+    </mdui-button>
+    <mdui-button variant="tonal" onclick="chooseMode('receiver')">
+      我是接收端
+    </mdui-button>
+  </div>
+</mdui-dialog>
+
+<script src="trans.js"></script>
+
+</body>
+</html>
