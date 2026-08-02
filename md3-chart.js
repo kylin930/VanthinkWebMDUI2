@@ -4,95 +4,50 @@ const MD3Chart = (() => {
   function createSvgEl(tag, attrs = {}) {
     const el = document.createElementNS(SVG_NS, tag);
     for (const [k, v] of Object.entries(attrs)) {
-      if (v !== undefined && v !== null) el.setAttribute(k, v);
+      if (v !== undefined && v !== null) el.setAttribute(k, String(v));
     }
     return el;
   }
 
   function formatNumber(n) {
-    if (n >= 10000) return (n / 10000).toFixed(1) + '万';
+    if (n >= 10000) return (n / 10000).toFixed(1) + 'w';
     if (n >= 1000) return (n / 1000).toFixed(1) + 'k';
     return Math.round(n).toString();
   }
 
-  function staggerDelay(index, total, baseDelay = 0) {
-    return baseDelay + (index / total) * 200;
-  }
-
-  function drawAxis(svg, opts) {
-    const { x, y, width, height, labels, yMax, yTicks = 4 } = opts;
-    const axisGroup = createSvgEl('g', { class: 'md3-chart-axis' });
-    const gridGroup = createSvgEl('g', { class: 'md3-chart-grid' });
-
-    const yAxis = createSvgEl('line', { x1: x, y1: y, x2: x, y2: y + height });
-    const xAxis = createSvgEl('line', { x1: x, y1: y + height, x2: x + width, y2: y + height });
-    axisGroup.appendChild(yAxis);
-    axisGroup.appendChild(xAxis);
-
-    for (let i = 0; i <= yTicks; i++) {
-      const ratio = i / yTicks;
-      const yPos = y + height - ratio * height;
-      const value = ratio * yMax;
-      const gridLine = createSvgEl('line', { x1: x, y1: yPos, x2: x + width, y2: yPos });
-      gridGroup.appendChild(gridLine);
-      const label = createSvgEl('text', { x: x - 8, y: yPos + 4, 'text-anchor': 'end' });
-      label.textContent = formatNumber(value);
-      axisGroup.appendChild(label);
+  function sampleLabels(labels, maxCount = 8) {
+    if (labels.length <= maxCount) return { labels, indices: labels.map((_, i) => i) };
+    const step = Math.ceil(labels.length / maxCount);
+    const result = [];
+    const indices = [];
+    for (let i = 0; i < labels.length; i += step) {
+      result.push(labels[i]);
+      indices.push(i);
     }
-
-    if (labels && labels.length) {
-      const step = width / labels.length;
-      labels.forEach((label, i) => {
-        const xPos = x + step * i + step / 2;
-        const text = createSvgEl('text', { x: xPos, y: y + height + 18, 'text-anchor': 'middle' });
-        text.textContent = label;
-        axisGroup.appendChild(text);
-      });
+    if (indices[indices.length - 1] !== labels.length - 1) {
+      result.push(labels[labels.length - 1]);
+      indices.push(labels.length - 1);
     }
-
-    svg.appendChild(gridGroup);
-    svg.appendChild(axisGroup);
-    return { step: labels ? width / labels.length : 0 };
+    return { labels: result, indices };
   }
 
-  function createTooltip(container) {
-    const tip = document.createElement('div');
-    tip.className = 'md3-chart-tooltip';
-    container.appendChild(tip);
-    return tip;
+  function getPrimaryColor() {
+    return getComputedStyle(document.documentElement).getPropertyValue('--mdui-color-primary').trim() || '#6750a4';
   }
 
-  function showTooltip(tip, container, x, y, html) {
-    tip.innerHTML = html;
-    tip.classList.add('md3-visible');
-    const rect = container.getBoundingClientRect();
-    const tipRect = tip.getBoundingClientRect();
-    let left = x - tipRect.width / 2;
-    let top = y - tipRect.height - 8;
-    if (left < 0) left = 0;
-    if (left + tipRect.width > rect.width) left = rect.width - tipRect.width;
-    if (top < 0) top = y + 8;
-    tip.style.left = left + 'px';
-    tip.style.top = top + 'px';
+  function getSecondaryColor() {
+    return getComputedStyle(document.documentElement).getPropertyValue('--mdui-color-secondary').trim() || '#625b71';
   }
 
-  function hideTooltip(tip) {
-    tip.classList.remove('md3-visible');
+  function getSurfaceVariant() {
+    return getComputedStyle(document.documentElement).getPropertyValue('--mdui-color-surface-variant').trim() || '#e7e0ec';
   }
 
   function barChart(container, opts) {
-    const {
-      title = '',
-      subtitle = '',
-      data = [],
-      labels = [],
-      height = 240,
-      showLegend = true,
-      legend = []
-    } = opts;
+    const { title = '', subtitle = '', data = [], labels = [], height = 260 } = opts;
 
     container.innerHTML = '';
-    container.classList.add('md3-chart-container');
+    container.className = 'md3-chart-container';
 
     if (title) {
       const titleEl = document.createElement('div');
@@ -107,114 +62,81 @@ const MD3Chart = (() => {
       container.appendChild(subEl);
     }
 
-    const padding = { top: 16, right: 16, bottom: 36, left: 48 };
-    const svgWidth = 500;
+    const padding = { top: 12, right: 16, bottom: 40, left: 48 };
+    const svgWidth = 560;
     const chartWidth = svgWidth - padding.left - padding.right;
     const chartHeight = height - padding.top - padding.bottom;
 
     const svg = createSvgEl('svg', {
-      class: 'md3-chart-svg',
-      viewBox: `0 0 ${svgWidth} ${height}`,
-      preserveAspectRatio: 'xMidYMid meet'
+      width: '100%',
+      height: height,
+      viewBox: `0 0 ${svgWidth} ${height}`
     });
     container.appendChild(svg);
 
-    const maxValue = Math.max(...data.map(d => d.value), 1) * 1.15;
-    const axisInfo = drawAxis(svg, {
-      x: padding.left,
-      y: padding.top,
-      width: chartWidth,
-      height: chartHeight,
-      labels,
-      yMax: maxValue,
-      yTicks: 4
+    const values = data.map(d => typeof d === 'object' ? d.value : d);
+    const maxValue = Math.max(...values, 1) * 1.1;
+
+    const yTicks = 4;
+    for (let i = 0; i <= yTicks; i++) {
+      const ratio = i / yTicks;
+      const yPos = padding.top + chartHeight - ratio * chartHeight;
+      const value = ratio * maxValue;
+      const gridLine = createSvgEl('line', {
+        x1: padding.left, y1: yPos, x2: padding.left + chartWidth, y2: yPos,
+        stroke: getSurfaceVariant(), 'stroke-width': 1
+      });
+      svg.appendChild(gridLine);
+      const label = createSvgEl('text', {
+        x: padding.left - 8, y: yPos + 4, 'text-anchor': 'end',
+        'font-size': 11, fill: '#666'
+      });
+      label.textContent = formatNumber(value);
+      svg.appendChild(label);
+    }
+
+    const xAxis = createSvgEl('line', {
+      x1: padding.left, y1: padding.top + chartHeight,
+      x2: padding.left + chartWidth, y2: padding.top + chartHeight,
+      stroke: '#ccc', 'stroke-width': 1
+    });
+    svg.appendChild(xAxis);
+
+    const { labels: displayLabels, indices: labelIndices } = sampleLabels(labels, 8);
+    displayLabels.forEach((label, idx) => {
+      const i = labelIndices[idx];
+      const step = chartWidth / labels.length;
+      const xPos = padding.left + step * i + step / 2;
+      const text = createSvgEl('text', {
+        x: xPos, y: padding.top + chartHeight + 20, 'text-anchor': 'middle',
+        'font-size': 11, fill: '#666'
+      });
+      text.textContent = label;
+      svg.appendChild(text);
     });
 
-    const tooltip = createTooltip(container);
-    const barGroup = createSvgEl('g');
+    const primaryColor = getPrimaryColor();
+    const barStep = chartWidth / labels.length;
+    const barWidth = Math.max(2, barStep * 0.65);
 
-    const barWidth = Math.min(axisInfo.step * 0.6, 36);
-    const seriesColors = ['md3-chart-bar', 'md3-chart-bar--secondary', 'md3-chart-bar--tertiary'];
-
-    data.forEach((item, i) => {
-      const barHeight = (item.value / maxValue) * chartHeight;
-      const x = padding.left + axisInfo.step * i + axisInfo.step / 2 - barWidth / 2;
+    values.forEach((value, i) => {
+      const barHeight = (value / maxValue) * chartHeight;
+      const x = padding.left + barStep * i + (barStep - barWidth) / 2;
       const y = padding.top + chartHeight - barHeight;
 
       const rect = createSvgEl('rect', {
-        class: seriesColors[i % 3],
-        x: x,
-        y: padding.top + chartHeight,
-        width: barWidth,
-        height: 0
+        x: x, y: y, width: barWidth, height: Math.max(0, barHeight),
+        fill: primaryColor, rx: 4, ry: 4
       });
-
-      rect.addEventListener('mouseenter', (e) => {
-        const rect2 = container.getBoundingClientRect();
-        showTooltip(tooltip, container,
-          e.clientX - rect2.left,
-          e.clientY - rect2.top,
-          `<strong>${labels[i] || item.label || ''}</strong><br>${item.value}`
-        );
-      });
-      rect.addEventListener('mousemove', (e) => {
-        const rect2 = container.getBoundingClientRect();
-        showTooltip(tooltip, container,
-          e.clientX - rect2.left,
-          e.clientY - rect2.top,
-          `<strong>${labels[i] || item.label || ''}</strong><br>${item.value}`
-        );
-      });
-      rect.addEventListener('mouseleave', () => hideTooltip(tooltip));
-
-      barGroup.appendChild(rect);
-
-      setTimeout(() => {
-        rect.style.transition = `y 700ms cubic-bezier(0.2, 0, 0, 1), height 700ms cubic-bezier(0.2, 0, 0, 1), opacity 500ms cubic-bezier(0.2, 0, 0, 1)`;
-        requestAnimationFrame(() => {
-          rect.setAttribute('y', y);
-          rect.setAttribute('height', barHeight);
-          rect.classList.add('md3-animate-in');
-        });
-      }, staggerDelay(i, data.length, 100));
+      svg.appendChild(rect);
     });
-
-    svg.appendChild(barGroup);
-
-    if (showLegend && legend.length) {
-      const legendEl = document.createElement('div');
-      legendEl.className = 'md3-chart-legend';
-      legend.forEach((item, i) => {
-        const legItem = document.createElement('div');
-        legItem.className = 'md3-chart-legend-item';
-        const color = document.createElement('div');
-        color.className = 'md3-chart-legend-color';
-        const cls = ['md3-chart-bar', 'md3-chart-bar--secondary', 'md3-chart-bar--tertiary'][i % 3];
-        color.style.background = getComputedStyle(document.documentElement)
-          .getPropertyValue(cls === 'md3-chart-bar' ? '--md3-chart-primary' :
-            cls === 'md3-chart-bar--secondary' ? '--md3-chart-secondary' : '--md3-chart-tertiary')
-          || '#6750a4';
-        legItem.appendChild(color);
-        legItem.appendChild(document.createTextNode(item));
-        legendEl.appendChild(legItem);
-      });
-      container.appendChild(legendEl);
-    }
   }
 
   function lineChart(container, opts) {
-    const {
-      title = '',
-      subtitle = '',
-      datasets = [],
-      labels = [],
-      height = 240,
-      showArea = true,
-      showLegend = true
-    } = opts;
+    const { title = '', subtitle = '', datasets = [], labels = [], height = 240, showArea = true } = opts;
 
     container.innerHTML = '';
-    container.classList.add('md3-chart-container');
+    container.className = 'md3-chart-container';
 
     if (title) {
       const titleEl = document.createElement('div');
@@ -229,127 +151,103 @@ const MD3Chart = (() => {
       container.appendChild(subEl);
     }
 
-    const padding = { top: 16, right: 16, bottom: 36, left: 48 };
-    const svgWidth = 500;
+    const padding = { top: 12, right: 16, bottom: 40, left: 48 };
+    const svgWidth = 560;
     const chartWidth = svgWidth - padding.left - padding.right;
     const chartHeight = height - padding.top - padding.bottom;
 
     const svg = createSvgEl('svg', {
-      class: 'md3-chart-svg',
-      viewBox: `0 0 ${svgWidth} ${height}`,
-      preserveAspectRatio: 'xMidYMid meet'
+      width: '100%',
+      height: height,
+      viewBox: `0 0 ${svgWidth} ${height}`
     });
     container.appendChild(svg);
 
-    const defs = createSvgEl('defs');
-    const grad = createSvgEl('linearGradient', {
-      id: 'md3-chart-area-gradient',
-      x1: '0', y1: '0', x2: '0', y2: '1'
-    });
-    grad.appendChild(createSvgEl('stop', { offset: '0%', 'stop-color': 'var(--md3-chart-primary)', 'stop-opacity': '0.3' }));
-    grad.appendChild(createSvgEl('stop', { offset: '100%', 'stop-color': 'var(--md3-chart-primary)', 'stop-opacity': '0' }));
-    defs.appendChild(grad);
-    svg.appendChild(defs);
-
     let allValues = [];
     datasets.forEach(ds => ds.data.forEach(v => allValues.push(v)));
-    const maxValue = Math.max(...allValues, 1) * 1.15;
+    const maxValue = Math.max(...allValues, 1) * 1.1;
 
-    drawAxis(svg, {
-      x: padding.left,
-      y: padding.top,
-      width: chartWidth,
-      height: chartHeight,
-      labels,
-      yMax: maxValue,
-      yTicks: 4
+    const yTicks = 4;
+    for (let i = 0; i <= yTicks; i++) {
+      const ratio = i / yTicks;
+      const yPos = padding.top + chartHeight - ratio * chartHeight;
+      const value = ratio * maxValue;
+      const gridLine = createSvgEl('line', {
+        x1: padding.left, y1: yPos, x2: padding.left + chartWidth, y2: yPos,
+        stroke: getSurfaceVariant(), 'stroke-width': 1
+      });
+      svg.appendChild(gridLine);
+      const label = createSvgEl('text', {
+        x: padding.left - 8, y: yPos + 4, 'text-anchor': 'end',
+        'font-size': 11, fill: '#666'
+      });
+      label.textContent = formatNumber(value);
+      svg.appendChild(label);
+    }
+
+    const xAxis = createSvgEl('line', {
+      x1: padding.left, y1: padding.top + chartHeight,
+      x2: padding.left + chartWidth, y2: padding.top + chartHeight,
+      stroke: '#ccc', 'stroke-width': 1
+    });
+    svg.appendChild(xAxis);
+
+    const { labels: displayLabels, indices: labelIndices } = sampleLabels(labels, 8);
+    displayLabels.forEach((label, idx) => {
+      const i = labelIndices[idx];
+      const step = chartWidth / Math.max(labels.length - 1, 1);
+      const xPos = padding.left + step * i;
+      const text = createSvgEl('text', {
+        x: xPos, y: padding.top + chartHeight + 20, 'text-anchor': 'middle',
+        'font-size': 11, fill: '#666'
+      });
+      text.textContent = label;
+      svg.appendChild(text);
     });
 
-    const tooltip = createTooltip(container);
+    const colors = [getPrimaryColor(), getSecondaryColor(), '#7d5260'];
     const step = chartWidth / Math.max(labels.length - 1, 1);
 
-    const colorVars = ['--md3-chart-primary', '--md3-chart-secondary', '--md3-chart-tertiary'];
-
     datasets.forEach((ds, dsIdx) => {
-      const colorVar = colorVars[dsIdx % 3];
-      const color = getComputedStyle(document.documentElement).getPropertyValue(colorVar) || '#6750a4';
-
-      const points = ds.data.map((v, i) => {
-        const x = padding.left + step * i;
-        const y = padding.top + chartHeight - (v / maxValue) * chartHeight;
-        return { x, y, value: v, label: labels[i] };
-      });
+      const color = colors[dsIdx % colors.length];
+      const points = ds.data.map((v, i) => ({
+        x: padding.left + step * i,
+        y: padding.top + chartHeight - (v / maxValue) * chartHeight
+      }));
 
       if (showArea && dsIdx === 0) {
         const areaPath = `M${points[0].x},${padding.top + chartHeight} ` +
           points.map(p => `L${p.x},${p.y}`).join(' ') +
           ` L${points[points.length - 1].x},${padding.top + chartHeight} Z`;
         const area = createSvgEl('path', {
-          class: 'md3-chart-area',
-          d: areaPath
+          d: areaPath,
+          fill: color,
+          'fill-opacity': 0.15
         });
         svg.appendChild(area);
-        setTimeout(() => area.classList.add('md3-animate-in'), 200);
       }
 
       const linePath = points.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x},${p.y}`).join(' ');
       const line = createSvgEl('path', {
-        class: 'md3-chart-line',
         d: linePath,
-        stroke: color.trim() || undefined
+        fill: 'none',
+        stroke: color,
+        'stroke-width': 2.5,
+        'stroke-linecap': 'round',
+        'stroke-linejoin': 'round'
       });
       svg.appendChild(line);
 
-      const dotGroup = createSvgEl('g');
-      points.forEach((p, i) => {
-        const dot = createSvgEl('circle', {
-          class: 'md3-chart-dot',
-          cx: p.x,
-          cy: p.y,
-          stroke: color.trim() || undefined
+      if (points.length <= 31) {
+        points.forEach(p => {
+          const dot = createSvgEl('circle', {
+            cx: p.x, cy: p.y, r: 3.5,
+            fill: '#fff', stroke: color, 'stroke-width': 2
+          });
+          svg.appendChild(dot);
         });
-        dot.addEventListener('mouseenter', (e) => {
-          const rect = container.getBoundingClientRect();
-          showTooltip(tooltip, container,
-            e.clientX - rect.left,
-            e.clientY - rect.top,
-            `<strong>${p.label}</strong><br>${ds.label ? ds.label + ': ' : ''}${p.value}`
-          );
-        });
-        dot.addEventListener('mousemove', (e) => {
-          const rect = container.getBoundingClientRect();
-          showTooltip(tooltip, container,
-            e.clientX - rect.left,
-            e.clientY - rect.top,
-            `<strong>${p.label}</strong><br>${ds.label ? ds.label + ': ' : ''}${p.value}`
-          );
-        });
-        dot.addEventListener('mouseleave', () => hideTooltip(tooltip));
-        dotGroup.appendChild(dot);
-        setTimeout(() => dot.classList.add('md3-animate-in'), 400 + i * 60);
-      });
-      svg.appendChild(dotGroup);
-
-      setTimeout(() => line.classList.add('md3-animate-in'), 300);
+      }
     });
-
-    if (showLegend && datasets.length > 1) {
-      const legendEl = document.createElement('div');
-      legendEl.className = 'md3-chart-legend';
-      datasets.forEach((ds, i) => {
-        const colorVar = colorVars[i % 3];
-        const color = getComputedStyle(document.documentElement).getPropertyValue(colorVar) || '#6750a4';
-        const legItem = document.createElement('div');
-        legItem.className = 'md3-chart-legend-item';
-        const c = document.createElement('div');
-        c.className = 'md3-chart-legend-color';
-        c.style.background = color.trim();
-        legItem.appendChild(c);
-        legItem.appendChild(document.createTextNode(ds.label || `系列 ${i + 1}`));
-        legendEl.appendChild(legItem);
-      });
-      container.appendChild(legendEl);
-    }
   }
 
   function statCards(container, cards) {
@@ -386,7 +284,7 @@ const MD3Chart = (() => {
       }
 
       grid.appendChild(el);
-      setTimeout(() => el.classList.add('md3-animate-in'), i * 80);
+      setTimeout(() => el.classList.add('md3-animate-in'), i * 60);
     });
 
     container.appendChild(grid);
