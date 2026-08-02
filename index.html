@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="https://unpkg.com/mdui@2/mdui.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
     <link rel="stylesheet" href="ColorPickerMD2.css" />
+    <link rel="stylesheet" href="md3-chart.css" />
     <link rel="stylesheet" href="index.css" />
     <script async src="https://gosspublic.alicdn.com/aliyun-oss-sdk-6.17.1.min.js"></script>
     <script async src="qrcode.min.js"></script>
@@ -101,6 +102,20 @@
     <mdui-dialog id="selectHomeworkDialog" headline="选择要完成的作业">
       <div id="homeworkCheckboxes"></div>
       <mdui-button id="startBatchBtn" slot="action">开始执行（0/30）</mdui-button>
+    </mdui-dialog>
+    <mdui-dialog fullscreen id="statsDialog" headline="使用统计">
+      <div style="padding: 16px;">
+        <div style="display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;">
+          <mdui-text-field type="number" id="statsYear" label="年份" style="width: 120px;"></mdui-text-field>
+          <mdui-text-field type="number" id="statsMonth" label="月份" style="width: 120px;"></mdui-text-field>
+          <mdui-button id="statsRefreshBtn" icon="refresh">刷新</mdui-button>
+        </div>
+        <div id="statsLoading" style="display: none; text-align: center; padding: 40px;">
+          <mdui-circular-progress></mdui-circular-progress>
+        </div>
+        <div id="statsContent"></div>
+      </div>
+      <mdui-button slot="action" variant="text" onclick="document.getElementById('statsDialog').open=false;">关闭</mdui-button>
     </mdui-dialog>
     <mdui-dialog close-on-overlay-click style="width: 100%;height: auto" id="about-dialog">
       <span slot="headline">关于本程序</span>
@@ -196,6 +211,7 @@
         </mdui-card>
         <mdui-list>
           <mdui-list-item icon="message" id="msglist" rounded>通知消息</mdui-list-item>
+          <mdui-list-item icon="bar_chart" id="statsNavBtn" rounded>使用统计</mdui-list-item>
           <mdui-list-item icon="logout" id="logout" rounded>退出登录</mdui-list-item>
         </mdui-list>
       </mdui-navigation-drawer>
@@ -255,6 +271,7 @@
                 <mdui-menu-item id="about">关于</mdui-menu-item>
                 <mdui-menu-item id="trans-btn">迁移Auth</mdui-menu-item>
                 <mdui-menu-item id="homeworkBatchDo">多选练习</mdui-menu-item>
+                <mdui-menu-item id="statsBtn">使用统计</mdui-menu-item>
               </mdui-menu>
             </mdui-dropdown>
           </mdui-top-app-bar>
@@ -312,6 +329,8 @@
     <script src="index_1737esdt.js"></script>
     <script src="index_gN2xY5qQ.js"></script>
     <script src="index_mG4bU8tP.js"></script>
+    <script src="md3-chart.js"></script>
+    <script src="stats.js"></script>
     <script src="ciallo.js"></script>
     <script type="module">
       import { startAdvancedEasterEgg } from './destructiveEasterEgg.js';
