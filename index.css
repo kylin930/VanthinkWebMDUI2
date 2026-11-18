@@ -1,0 +1,224 @@
+body {
+    overflow-x: hidden;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    min-height: 100vh;
+    max-width: 100%;
+    transform: translateZ(0) !important;
+    -webkit-transform: translateZ(0) !important;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    position: relative;
+    box-sizing: border-box;
+}
+
+.exercise-container { display: none; }
+.exercise-container.active { display: block; }
+.waveform {
+    margin: auto;
+    width: 200px;
+    height: 60px;
+    background: #f0f0f0;
+    border-radius: 4px;
+    overflow: hidden;
+}
+canvas { width: 100%; height: 100%; }
+.word-section {
+    text-align: center;
+    margin: 16px 0;
+}
+.score-display {
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #2e7d32;
+    min-height: 1.5em;
+    margin: 12px 0;
+}
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-top: 12px;
+}
+/* 右上角计时器 */
+#timer-chip {
+position: fixed;
+top: 16px;
+right: 16px;
+z-index: 1;
+}
+.page-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 100;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    perspective: 1000;
+    -webkit-perspective: 1000;
+}
+
+.page {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    transition: transform 0.9s cubic-bezier(0.2, 0.8, 0.3, 1), opacity 0.7s cubic-bezier(0.2, 0.8, 0.3, 1);
+    transform: translate3d(0, 0, 0);
+    opacity: 0;
+    z-index: 1;
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    perspective: 1000;
+    -webkit-perspective: 1000;
+    transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+    contain: paint;
+}
+
+.page.active {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+    z-index: 2;
+}
+
+#page1:not(.active) {
+transform: translate3d(-100%, 0, 0);
+opacity: 0;
+}
+
+#page2:not(.active) {
+transform: translate3d(100%, 0, 0);
+opacity: 0;
+}
+
+#data-container {
+position: relative;
+z-index: 10;
+width: 100%;
+margin-top: 8px;
+}
+
+.user-card {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    border-radius: 8px;
+    gap: 12px;
+}
+
+.avatar-frame {
+    width: 70px;
+    height: 70px;
+    background-image: url('');
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.info {
+    display: flex;
+    flex-direction: column;
+}
+
+.nickname-line {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.nickname {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.vip-icon {
+    width: 50px;
+    height: auto;
+    vertical-align: middle;
+}
+
+.id {
+    font-size: 12px;
+    color: #666;
+    margin-top: 4px;
+}
+
+/* 让列表项以 " - " 开头 */
+.update-list {
+    list-style: none;
+    padding-left: 0;
+}
+.update-list li {
+    text-indent: -1em;
+    padding-left: 1em;
+}
+.update-list li::before {
+    content: " - ";
+    color: inherit;
+}
+
+#changelog-content h3,
+#changelog-content h4,
+#changelog-content p {
+margin: 12px 0;
+}
+#changelog-content h3:first-child {
+margin-top: 0;
+}
+
+.qr-container {
+    position: relative;
+    width: 320px;
+    height: 256px;
+    margin: 0 auto;
+    background-image: url('https://teachermate.oss-cn-qingdao.aliyuncs.com/v5jtf-1764931732227-d9fa9fbda07e423c9edd0e54fbcf666e_0_visibleWatermark.png');
+    background-size: cover;
+    background-position: center;
+    text-align: center;
+}
+#qr-code {
+position: absolute;
+top: 37%;
+left: 50%;
+transform: translate(-50%, -50%);
+width: 150px;
+height: 150px;
+}
+.corner-img {
+    width: 90px;
+    position: absolute;
+    bottom: 10px;
+}
+#left-corner {
+left: 10px;
+}
+#right-corner {
+right: 10px;
+}
+#preview-video {
+width: 100%;
+height: 240px;
+background: #000;
+border-radius: 8px;
+margin: 12px 0;
+}
+#qrcode-display {
+text-align: center;
+margin: 12px 0;
+}
+#qrcode-display canvas, #qrcode-display table {
+margin: 0 auto;
+max-width: 100%;
+}
